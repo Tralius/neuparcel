@@ -14,34 +14,14 @@ const Parcel = (props) => {
         "6": require('../assets/p6.png'),
     }
 
-    const [parcelModalVisible, setParcelModalVisible] = useState(false);
+    const [focused, setFocused] = useState(false);
 
     return(
-        <Pressable onPress={() => setParcelModalVisible(true)}>
+        <Pressable onPress={() => {
+            props.activateModal(props.id)
+        }
+        }>
         <View style={parcelStyles.container}>
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={parcelModalVisible}
-                onRequestClose={() => {
-                Alert.alert('Modal has been closed.');
-                setModalVisible(!parcelModalVisible);
-                }}>
-               <View style={parcelStyles.parcelModalWrapper}>
-                <View style={parcelStyles.parcelModalContent}>
-                    <View>
-                        <TextInput placeholder='Name'/>
-                        <TextInput placeholder='Size'/>
-                        <TextInput placeholder='From'/>
-                        <TextInput placeholder='Destination'/>
-                        <TextInput placeholder='Time'/>
-                    </View>
-                    <View style={parcelStyles.parcelModalFooter}>
-                        <Button onPress={() => setParcelModalVisible(!parcelModalVisible)}>Close</Button>
-                    </View>
-                </View>
-               </View>
-            </Modal>
             <View style={parcelStyles.left_container}>
                 <Image style={parcelStyles.parcelImage}
                     source={sizeToImage[props.size]} />
@@ -82,17 +62,8 @@ const parcelStyles = StyleSheet.create({
         padding: 2,
         height: 100,
         margin: 8,
-        borderWidth: 1,
-        borderRadius: 8,
-        backgroundColor: '#fff',
-        shadowColor: '#000',
-        shadowOffset: {
-        width: 0,
-        height: 2,
-        },
-        shadowOpacity: 0.2,
-        shadowRadius: 3,
-        elevation: 3,
+        borderRadius: 20,
+        backgroundColor: '#E9E9EF',
     },
     left_container: {
         paddingRight: 10,

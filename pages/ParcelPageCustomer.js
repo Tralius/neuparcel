@@ -1,111 +1,65 @@
-import { StyleSheet, Text, View, Pressable, Modal, TextInput} from 'react-native';
-import { Icon } from '@rneui/themed';
-import React, {useState} from 'react';
+import { StyleSheet, Text, View, ScrollView} from 'react-native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 import ParcelList from '../components/ParcelList';
-import { Button} from '@rneui/base';
+import ParcelCustomerSelectedModal from '../components/ParcelCustomerSelectedModal';
 
-const ParcelPageCustomer = () => {
+import BottomSheet from '../components/BottomSheet';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+const ParcelPageCustomer = (props) => {
+    
+    const ref = useRef(null);
+
+    const activateModal = useCallback((id) => {
+        const isActive = ref?.current?.isActive();
+        //setParcel(parcelArray[id])
+        if (isActive){
+          ref?.current?.scrollTo(0)
+        } else {
+          ref?.current?.scrollTo(-525)
+        }
+        
+      }, []);
+
     const parcelArray = [
         {
+            id: "parcel1",
             name: "John",
             from: "SendlingerTor",
             to: "Marien Platz",
-            time: "10:00",
-            size: "3"
+            time: "19. Sep 10:00",
+            size: "3",
+            weight: "5kg"
         }
     ]
 
-    // States for Modal
-    const [modalVisible, setModalVisible] = useState(false);
-    const [name, setName] = useState('');
-    const [from, setFrom] = useState('');
-    const [to, setTo] = useState('');
-    const [size, setSize] = useState('');
-    const [time, setTime] = useState('10:00');
-    const [parcels, setParcels] = useState(parcelArray);
+    const [parcel, setParcel] = useState(parcelArray[0]);
+    const [delivered, setDelivered] = useState(false);
 
-    const addParcel = () => {
-        console.log("Add button pressed");
-        setModalVisible(!modalVisible);
-    }
-    
-    const addParcelModal = () => {
-        console.log("Add button pressed");
-        setModalVisible(!modalVisible);
-        setParcels([...parcels, {name: name, from: from, to: to, size: size, time: time}]);
-    }
-    
+    const list = !delivered ? <ParcelList parcels={parcelArray} activateModal={activateModal}></ParcelList> : <Text>Thank you for delivering with neuparcel! You have received 50 cent. 
+        Other packages are waiting to be delivered, have fun!
+    </Text>
 
     return (
-        <View style={customerStyle.container}>
-            <View style={customerStyle.addButton}>
-                <Icon name='inbox' />
-                <Button onPress={addParcel}>Add Parcel</Button>
-            </View>
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => {
-                Alert.alert('Modal has been closed.');
-                setModalVisible(!modalVisible);
-                }}>
-               <View style={customerStyle.parcelModalWrapper}>
-                <View style={customerStyle.parcelModalContent}>
-                    <View>
-                        <TextInput placeholder='Name' onChangeText={text => setName(text)}/>
-                        <TextInput placeholder='Size' onChangeText={text => setSize(text)}/>
-                        <TextInput placeholder='From' onChangeText={text => setFrom(text)}/>
-                        <TextInput placeholder='Destination' onChangeText={text => setTo(text)}/>
-                        <TextInput placeholder='Time' onChangeText={text => setTime(text)}/>
-                    </View>
-                    <View style={customerStyle.parcelModalFooter}>
-                        <Button onPress={() => setModalVisible(!modalVisible)}>Cancel</Button>
-                        <Button onPress={() => addParcelModal()}>Add</Button>
-                    </View>
-                </View>
-               </View>
-            </Modal>
-            <ParcelList parcels={parcels} ></ParcelList>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+        <View style={parcelCustomerPageStyle.container}>
+            <ScrollView>
+                {list}
+            </ScrollView>
+
+            <BottomSheet ref={ref}>
+                <ParcelCustomerSelectedModal parcel={parcel} setDelivered={setDelivered}></ParcelCustomerSelectedModal>
+            </BottomSheet>
         </View>
+        </GestureHandlerRootView>
     );
 }
 
-const customerStyle = StyleSheet.create({
+const parcelCustomerPageStyle = StyleSheet.create({
     container: {
         flex: 1,
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        width: '90%',
-    },
-    addButton: {
-        flex: 1,
         flexDirection: 'row',
-    },
-    parcelModalWrapper:{
-        position: 'absolute',
-        top: '30%',
-        alignSelf: 'center',
-        width: '80%',
-        height: '40%',
-        backgroundColor: '#fff',
-        borderColor: '#000',
-        borderRadius: 8,
-        borderWidth:2,
-    },
-    parcelModalContent: {
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        alignContent: 'space-between',
-    },
-    parcelModalFooter: {
-        flex:1,
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        alignContent: 'space-between',
     }
 });
 

@@ -4,6 +4,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import NavigationNeuparcel from './components/NavigationNeuparcel';
 
+import { ParcelProvider } from './components/parcelContext';
+import { AppProvider } from './components/appContext';
+
 const MyTheme = {
   ...DefaultTheme,
   colors: {
@@ -13,10 +16,15 @@ const MyTheme = {
 };
 
 export default function App() {
+
   return (
-    <NavigationContainer theme={MyTheme}>
-      <NavigationNeuparcel />
-    </NavigationContainer>
+    <AppProvider>  
+         <ParcelProvider>
+            <NavigationContainer theme={MyTheme}>
+              <NavigationNeuparcel />
+            </NavigationContainer>
+          </ParcelProvider>
+    </AppProvider>
   );
 }
 

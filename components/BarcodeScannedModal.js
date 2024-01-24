@@ -3,7 +3,7 @@ import { Button} from '@rneui/base';
 import React, {useState, useEffect} from 'react';
 
 import * as Location from 'expo-location';
-
+import { useParcelContext } from '../components/parcelContext';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -11,6 +11,13 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 const BarcodeScannedModal = (props) => {
     const [location, setLocation] = useState(null);
     const [errorMsg, setErrorMsg] = useState(null);
+
+    const { state, dispatch } = useParcelContext();
+    const selectedParcel = state.selectedScanParcel;
+
+    const validate = id => {
+        dispatch({ type: 'VALIDATE_SCAN', payload: id });
+      };
 
     useEffect(() => {
         (async () => {
@@ -27,14 +34,14 @@ const BarcodeScannedModal = (props) => {
        }, []);
 
     const onPress = () => {
-        props.setScanned(false);
-        
         let text = 'Waiting..';
         if (errorMsg) {
             text = errorMsg;
         } else if (location) {
             text = JSON.stringify(location);
         }
+        props.setShowSheet(false);
+        validate(selectedParcel['id']);
     }
 
     return(
@@ -45,11 +52,11 @@ const BarcodeScannedModal = (props) => {
             </View>
             <View style={barcodeStyle.infos}>
                 <Text style={barcodeStyle.left_text}>Reference:</Text>
-                <Text style={barcodeStyle.referenceText}>{props.parcel['id']}</Text>
+                <Text style={barcodeStyle.referenceText}>{selectedParcel['id']}</Text>
             </View>
             <View style={barcodeStyle.infos}>
                 <Text style={barcodeStyle.left_text}>Drop off:</Text>
-                <Text>{props.parcel['to']}</Text>
+                <Text>{selectedParcel['to']}</Text>
             </View>
             <View style={barcodeStyle.infos}>
                 <Text style={barcodeStyle.left_text}>Details:</Text>
@@ -57,7 +64,7 @@ const BarcodeScannedModal = (props) => {
                     <MaterialCommunityIcons name="package-variant-closed" size={30} color="#000"/>
                     <Text>{1}</Text>
                     <MaterialCommunityIcons name="weight" size={30} color="#000"/>
-                    <Text>{props.parcel['weight']}</Text>
+                    <Text>{selectedParcel['weight']}</Text>
                 </View>
             </View>
             <View>

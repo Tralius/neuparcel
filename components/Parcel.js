@@ -14,14 +14,12 @@ const Parcel = (props) => {
         "6": require('../assets/p6.png'),
     }
 
-    const [focused, setFocused] = useState(false);
-
     return(
         <Pressable onPress={() => {
-            props.activateModal(props.id)
+            props.activateModal(props.identification)
         }
         }>
-        <View style={parcelStyles.container}>
+        <View style={parcelStyles.container} backgroundColor={"#FFF" ? props.status !== "pending" : "#6C63FF"}>
             <View style={parcelStyles.left_container}>
                 <Image style={parcelStyles.parcelImage}
                     source={sizeToImage[props.size]} />
@@ -63,7 +61,6 @@ const parcelStyles = StyleSheet.create({
         height: 100,
         margin: 8,
         borderRadius: 20,
-        backgroundColor: '#E9E9EF',
     },
     left_container: {
         paddingRight: 10,

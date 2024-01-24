@@ -1,14 +1,19 @@
 import { StyleSheet, Text, View, Image, Pressable, TextInput, TouchableOpacity} from 'react-native';
 import { Button} from '@rneui/base';
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useParcelContext } from '../components/parcelContext';
 
 const ParcelSelectedModal = (props) => {
 
-    const onPress = () => {
-        //props.setParcelSelected(true);
-    }
+    const { state, dispatch } = useParcelContext();
+    const selectedParcel = state.selectedDeliveryParcel;
 
+    const onPress = () => {
+        dispatch({ type: 'RESERVE_PARCEL', payload: selectedParcel['id'] });
+        props.setShowSheet(false);
+    }
+    
     return(
             <View style={parcelModalStyle.container}>
                 <View style={parcelModalStyle.first}>
@@ -17,11 +22,11 @@ const ParcelSelectedModal = (props) => {
                 </View>
                 <View style={parcelModalStyle.infos}>
                     <Text style={parcelModalStyle.left_text}>Reference:</Text>
-                    <Text style={parcelModalStyle.referenceText}>{props.parcel['id']}</Text>
+                    <Text style={parcelModalStyle.referenceText}>{selectedParcel['id']}</Text>
                 </View>
                 <View style={parcelModalStyle.infos}>
                     <Text style={parcelModalStyle.left_text}>Drop off:</Text>
-                    <Text>{props.parcel['to']}</Text>
+                    <Text>{selectedParcel['to']}</Text>
                 </View>
                 <View style={parcelModalStyle.infos}>
                     <Text style={parcelModalStyle.left_text}>Details:</Text>
@@ -29,7 +34,7 @@ const ParcelSelectedModal = (props) => {
                         <MaterialCommunityIcons name="package-variant-closed" size={30} color="#000"/>
                         <Text>{1}</Text>
                         <MaterialCommunityIcons name="weight" size={30} color="#000"/>
-                        <Text>{props.parcel['weight']}</Text>
+                        <Text>{selectedParcel['weight']}</Text>
                     </View>
                 </View>
                 <View>
@@ -48,6 +53,7 @@ const parcelModalStyle = StyleSheet.create({
     flexDirection: 'column',
     width: '80%',
     alignSelf: 'center',
+    height: '80%',
    },
    first: {
     flex: 0,

@@ -2,12 +2,21 @@ import { StyleSheet, Text, View, Image, Pressable, TextInput, TouchableOpacity} 
 import { Button} from '@rneui/base';
 import React, {useState} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useParcelContext } from '../components/parcelContext';
+import { useAppContext } from '../components/appContext';
 
 const ParcelCustomerSelectedModal = (props) => {
 
+    const { state, dispatch } = useParcelContext();
+    const { appState, appDispatch } = useAppContext();
+    
+    const selectedParcel = state.selectedReservedParcel;
+
     const onPress = () => {
-        //props.setParcelSelected(true);]
-        props.setDelivered(true)
+        dispatch({ type: 'DELIVER_PARCEL', payload: selectedParcel['id'] });
+        appDispatch({ type: 'INCREMENT_MONEY_EARNED', payload: selectedParcel['price'] });
+        appDispatch({ type: 'INCREMENT_PARCELS_DELIVERED' });
+        props.setShowSheet(false);
     }
 
     return(
@@ -18,11 +27,11 @@ const ParcelCustomerSelectedModal = (props) => {
                 </View>
                 <View style={parcelModalStyle.infos}>
                     <Text style={parcelModalStyle.left_text}>Reference:</Text>
-                    <Text style={parcelModalStyle.referenceText}>{props.parcel['id']}</Text>
+                    <Text style={parcelModalStyle.referenceText}>{selectedParcel['id']}</Text>
                 </View>
                 <View style={parcelModalStyle.infos}>
                     <Text style={parcelModalStyle.left_text}>Drop off:</Text>
-                    <Text>{props.parcel['to']}</Text>
+                    <Text>{selectedParcel['to']}</Text>
                 </View>
                 <View style={parcelModalStyle.infos}>
                     <Text style={parcelModalStyle.left_text}>Details:</Text>
@@ -30,7 +39,7 @@ const ParcelCustomerSelectedModal = (props) => {
                         <MaterialCommunityIcons name="package-variant-closed" size={30} color="#000"/>
                         <Text>{1}</Text>
                         <MaterialCommunityIcons name="weight" size={30} color="#000"/>
-                        <Text>{props.parcel['weight']}</Text>
+                        <Text>{selectedParcel['weight']}</Text>
                     </View>
                 </View>
                 <View>

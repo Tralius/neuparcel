@@ -1,57 +1,47 @@
-import { StyleSheet, Text, View, ScrollView} from 'react-native';
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { StyleSheet, Text, View, ScrollView, Pressable} from 'react-native';
+import React, { useState, useContext, useCallback, useRef } from 'react';
 
 import ParcelList from '../components/ParcelList';
+import { useParcelContext } from '../components/parcelContext';
 import ParcelCustomerSelectedModal from '../components/ParcelCustomerSelectedModal';
 
-import BottomSheet from '../components/BottomSheet';
+import Animated, { SlideOutDown } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SlideInDown } from 'react-native-reanimated';
 
 const ParcelPageCustomer = (props) => {
     
-    const ref = useRef(null);
+    const { state, dispatch } = useParcelContext();
+    const [showSheet, setShowSheet] = useState(false);
+    const parcelArray = state.reservedParcels
 
-    const activateModal = useCallback((id) => {
-        const isActive = ref?.current?.isActive();
-        //setParcel(parcelArray[id])
-        if (isActive){
-          ref?.current?.scrollTo(0)
-        } else {
-          ref?.current?.scrollTo(-525)
-        }
-        
-      }, []);
+    const selectParcel = id => {
+        dispatch({ type: 'SELECT_FROM_RESERVED', payload: id });
+      };
 
-    const parcelArray = [
-        {
-            id: "parcel1",
-            name: "John",
-            from: "SendlingerTor",
-            to: "Marien Platz",
-            time: "19. Sep 10:00",
-            size: "3",
-            weight: "5kg"
-        }
-    ]
-
-    const [parcel, setParcel] = useState(parcelArray[0]);
-    const [delivered, setDelivered] = useState(false);
-
-    const list = !delivered ? <ParcelList parcels={parcelArray} activateModal={activateModal}></ParcelList> : <Text>Thank you for delivering with neuparcel! You have received 50 cent. 
-        Other packages are waiting to be delivered, have fun!
-    </Text>
+    const activateModal = (id) => {
+        selectParcel(id);
+        setShowSheet(true);
+    }
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
-        <View style={parcelCustomerPageStyle.container}>
-            <ScrollView>
-                {list}
-            </ScrollView>
-
-            <BottomSheet ref={ref}>
-                <ParcelCustomerSelectedModal parcel={parcel} setDelivered={setDelivered}></ParcelCustomerSelectedModal>
-            </BottomSheet>
-        </View>
+           <SafeAreaProvider>
+                <View style={parcelCustomerPageStyle.container}>
+                    <ScrollView>
+                        <ParcelList parcels={parcelArray} activateModal={activateModal}></ParcelList>
+                    </ScrollView>
+                {showSheet && (
+                    <>
+                        <Pressable style={parcelCustomerPageStyle.backdrop}/>
+                        <Animated.View style={parcelCustomerPageStyle.sheet} entering={SlideInDown} exiting={SlideOutDown}>
+                            <ParcelCustomerSelectedModal setShowSheet={setShowSheet}></ParcelCustomerSelectedModal>
+                        </Animated.View>
+                    </>
+                )}
+                </View>
+            </SafeAreaProvider>
         </GestureHandlerRootView>
     );
 }
@@ -60,7 +50,23 @@ const parcelCustomerPageStyle = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'row',
-    }
+    }, 
+    sheet: {
+        backgroundColor: "white",
+        padding: 16,
+        height: 400,
+        width: "100%",
+        position: "absolute",
+        bottom: -20 * 1.1,
+        borderTopRightRadius: 20,
+        borderTopLeftRadius: 20,
+        zIndex: 10,
+    },
+    backdrop: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: "rgba(0, 0, 0, 0.3)",
+        zIndex: 1,
+      },
 });
 
 export default ParcelPageCustomer;
